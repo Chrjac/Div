@@ -1,0 +1,10 @@
+ public static object dsmToLatLng(double latD, double latM, double latS, double lonD, double lonM, double lonS) 
+        {
+            var lat = (latD + latM / 60 + latS / 3600);
+            var lon = (lonD + lonM / 60 + lonS / 3600);
+
+            double[] results = { lat, lon };
+            return results;
+            
+        }
+
