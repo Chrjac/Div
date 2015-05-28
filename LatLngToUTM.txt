@@ -1,0 +1,54 @@
+public static object latlongToUTM(double lnginp, double latinp) {
+            var Item = 0;
+            var k0 = 0.9996;
+            var M0 = 0;
+
+            //Arrayene er gitt med radianer fase skifte under "EarthTide" dvs at når månene passere et gitt sted vil radianer forskyvning oppstå og diameteren på jorda vil forandres.
+            double[] DatumEqRad = {6378137.0, 6378137.0, 6378137.0, 6378135.0, 6378160.0, 6378245.0, 6378206.4, 6378388.0, 6378388.0, 6378249.1, 6378206.4, 6377563.4, 6377397.2, 6377276.3};
+            double[] DatumFlat = {298.2572236, 298.2572236, 298.2572215, 298.2597208, 298.2497323, 298.2997381, 294.9786982, 296.9993621, 296.9993621, 293.4660167, 294.9786982, 299.3247788,
+            299.1527052, 300.8021499};
+
+            double a = DatumEqRad[Item];
+            double f = 1.0 / DatumFlat[Item];
+            double b = a * (1.0 - f);
+
+            double e = Math.Sqrt(1.0 - (b / a) * (b / a));
+
+            double drad = Math.PI / 180.0;
+
+
+            double phi = latinp * drad;
+           // double lng = lnginp * drad;
+
+            int utmz = 33;
+
+            var zcm = 3.0 + 6.0 * (utmz - 1.0) - 180.0;
+            double e0 = e / Math.Sqrt(1.0 - e * e);
+            double esq = (1 - (b / a) * (b / a));
+            double e0sq = e * e / (1.0 - e * e);
+            double N = a / Math.Sqrt(1 - Math.Pow(e * Math.Sin(phi), 2.0));
+            double T = Math.Pow(Math.Tan(phi), 2.0);
+            double C = e0sq * Math.Pow(Math.Cos(phi), 2.0);
+            double A = (lnginp - zcm) * drad * Math.Cos(phi);
+            double M = phi * (1.0 - esq * (1.0 / 4.0 + esq * (3.0 / 64.0 + 5.0 * esq / 256.0)));
+            M = M - Math.Sin(2.0 * phi) * (esq * (3.0 / 8.0 + esq * (3.0 / 32.0 + 45.0 * esq / 1024.0)));
+            M = M + Math.Sin(4.0 * phi) * (esq * esq * (15.0 / 256.0 + esq * 45.0 / 1024.0));
+            M = M - Math.Sin(6.0 * phi) * (esq * esq * esq * (35.0 / 3072.0));
+            M = M * a;
+
+            var x = k0 * N * A * (1.0 + A * A * ((1.0 - T + C) / 6.0 + A * A * (5.0 - 18.0 * T + T * T + 72.0 * C - 58.0 * e0sq) / 120.0));
+            x = x + 500000.0;
+
+            var y = k0 * (M - M0 + N * Math.Tan(phi) * (A * A * (1.0 / 2.0 + A * A * ((5.0 - T + 9.0 * C + 4.0 * C * C) / 24.0 + A * A * (61.0 - 58.0 * T + T * T + 600.0 * C - 330.0 * e0sq) / 720.0))));
+
+            if (y < 0.0)
+            {
+                y = 10000000.0 + y;
+            }
+
+            var xkoordinat = 10.0 * (x) / 10.0;
+            var ykoordinat = 10.0 * y / 10.0;
+
+            double[] results = {xkoordinat, ykoordinat};
+            return results;
+        }
